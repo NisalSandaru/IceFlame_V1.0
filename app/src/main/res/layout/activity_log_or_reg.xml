@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".activity.LogOrRegActivity">
+
+    <ImageView
+        android:id="@+id/log_or_reg_image"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/chicken_biryani" />
+
+    <TextView
+        android:id="@+id/log_or_reg_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Let’s Get Started"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/log_or_reg_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your delicious journey begins now"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:layout_marginTop="12dp"/>
+
+    <Button
+        android:id="@+id/log_or_reg_btn"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:text="Log In or Sign up"
+        android:layout_marginTop="35dp"
+        />
+
+</LinearLayout>
