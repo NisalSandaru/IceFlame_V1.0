@@ -50,7 +50,7 @@ public class LogInActivity extends AppCompatActivity {
             }
 
             SignInRequest request = new SignInRequest(email, password);
-            AuthApi api = RetrofitClient.getApi();
+            AuthApi api = RetrofitClient.getAuthApi();
 
             api.signIn(request).enqueue(new Callback<User>() {
                 @Override

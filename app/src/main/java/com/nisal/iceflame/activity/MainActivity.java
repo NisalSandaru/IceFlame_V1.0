@@ -2,10 +2,13 @@ package com.nisal.iceflame.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -13,16 +16,22 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.nisal.iceflame.R;
 import com.nisal.iceflame.databinding.ActivityMainBinding;
 import com.nisal.iceflame.databinding.SideNavHeaderBinding;
+import com.nisal.iceflame.fragment.ExploreFragment;
+import com.nisal.iceflame.fragment.HomeFragment;
 import com.nisal.iceflame.fragment.ProfileFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener{
 
     private ActivityMainBinding binding;
     private SideNavHeaderBinding sideNavHeaderBinding;
@@ -72,5 +81,51 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnItemSelectedListener(this);
+
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+            navigationView.getMenu().findItem(R.id.side_nav_home).setChecked(true);
+            bottomNavigationView.getMenu().findItem(R.id.bottom_nav_home).setChecked(true);
+        }
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+
+        Menu navMenu = navigationView.getMenu();
+        Menu bottonNavMenu = bottomNavigationView.getMenu();
+
+        for (int i=0; i<navMenu.size(); i++){
+            navMenu.getItem(i).setChecked(false);
+        }
+
+        for (int i = 0; i < bottonNavMenu.size(); i++){
+            bottonNavMenu.getItem(i).setChecked(false);
+        }
+
+        if (itemId == R.id.side_nav_home || itemId == R.id.bottom_nav_home){
+            loadFragment(new HomeFragment());
+            navigationView.getMenu().findItem(R.id.side_nav_home).setChecked(true);
+            bottomNavigationView.getMenu().findItem(R.id.bottom_nav_home).setChecked(true);
+        } else if (itemId == R.id.bottom_nav_category) {
+            loadFragment(new ExploreFragment());
+            bottomNavigationView.getMenu().findItem(R.id.bottom_nav_category).setChecked(true);
+        }
+        return true;
+    }
+
+    private void loadFragment(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+
+    }
+
 }

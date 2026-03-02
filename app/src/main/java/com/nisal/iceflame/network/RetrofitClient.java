@@ -9,10 +9,8 @@ public class RetrofitClient {
 
     private static Retrofit retrofit;
 
-    public static AuthApi getApi() {
-
+    private static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
-            // Logging interceptor
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -22,11 +20,18 @@ public class RetrofitClient {
 
             retrofit = new Retrofit.Builder()
                     .baseUrl("http://192.168.8.100:8080/")
-                    .client(client) // attach client with logging
+                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
+        return retrofit;
+    }
 
-        return retrofit.create(AuthApi.class);
+    public static AuthApi getAuthApi() {
+        return getRetrofitInstance().create(AuthApi.class);
+    }
+
+    public static CategoryApi getCategoryApi() {
+        return getRetrofitInstance().create(CategoryApi.class);
     }
 }
