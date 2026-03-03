@@ -22,6 +22,7 @@ import com.nisal.iceflame.network.RetrofitClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,8 +51,18 @@ public class ExploreFragment extends Fragment {
         binding.recyclerCategories.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
         adapter = new CategoryAdapter(categoryList, category -> {
-            Toast.makeText(getContext(), "Clicked: " + category.getName(), Toast.LENGTH_SHORT).show();
+            Toasty.success(getContext(), "Clicked: " + category.getName(), Toast.LENGTH_SHORT, true).show();
             // TODO: open products fragment for this category
+            Bundle bundle = new Bundle();
+            bundle.putLong("categoryId", category.getId());
+
+            Fragment fragment = new ListingFragment();
+            fragment.setArguments(bundle);
+
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         binding.recyclerCategories.setAdapter(adapter);
@@ -69,7 +80,7 @@ public class ExploreFragment extends Fragment {
                             categoryList.addAll(response.body());
                             adapter.notifyDataSetChanged();
                         } else {
-                            Toast.makeText(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
+                            Toasty.error(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
                         }
                     }
 

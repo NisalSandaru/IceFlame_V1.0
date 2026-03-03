@@ -34,4 +34,8 @@ public class RetrofitClient {
     public static CategoryApi getCategoryApi() {
         return getRetrofitInstance().create(CategoryApi.class);
     }
+
+    public static ProductApi getProductApi() {
+        return getRetrofitInstance().create(ProductApi.class);
+    }
 }
