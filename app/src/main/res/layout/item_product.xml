@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="4dp">
 
         <!-- LEFT IMAGE SECTION -->
         <FrameLayout
@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Product Title"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:maxLines="2"
                 android:ellipsize="end"/>
@@ -78,10 +78,10 @@
                 android:id="@+id/tv_product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rs. 1200"
-                android:textColor="#E53935"
+                android:text="Rs.1200"
+                android:textColor="@color/md_theme_tertiaryFixedDim_mediumContrast"
                 android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:paddingTop="6dp"/>
 
             <!-- ICON BUTTONS -->

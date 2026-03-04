@@ -51,4 +51,5 @@ dependencies {
     implementation libs.logging.interceptor
 
     implementation libs.toasty
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 }

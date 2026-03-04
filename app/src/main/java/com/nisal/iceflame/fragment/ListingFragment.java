@@ -6,11 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.nisal.iceflame.R;
 import com.nisal.iceflame.adapters.ListingAdapter;
 import com.nisal.iceflame.databinding.FragmentListingBinding;
 import com.nisal.iceflame.model.ProductDto;
@@ -27,55 +29,133 @@ public class ListingFragment extends Fragment {
 
     private FragmentListingBinding binding;
     private ListingAdapter adapter;
-    private Long categoryId;
-    private List<ProductDto> productList = new ArrayList<>();
+    private Long categoryId = 0L;
+    private final List<ProductDto> productList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null){
+
+        // ✅ Safe argument handling
+        if (getArguments() != null && getArguments().containsKey("categoryId")) {
             categoryId = getArguments().getLong("categoryId");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
+
         binding = FragmentListingBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.recyclerViewListing.setLayoutManager(new GridLayoutManager(getContext(),1));
-
-        adapter = new ListingAdapter(productList);
-        binding.recyclerViewListing.setAdapter(adapter);
-
+        setupRecyclerView();
+        showLoading(true);
         loadProducts();
+
+        // ✅ Handle back press properly
+        requireActivity().getOnBackPressedDispatcher()
+                .addCallback(getViewLifecycleOwner(),
+                        new OnBackPressedCallback(true) {
+                            @Override
+                            public void handleOnBackPressed() {
+                                requireActivity()
+                                        .getSupportFragmentManager()
+                                        .popBackStack();
+                            }
+                        });
     }
 
-    private void loadProducts(){
+    // ✅ Setup RecyclerView
+    private void setupRecyclerView() {
+
+        binding.recyclerViewListing.setLayoutManager(
+                new GridLayoutManager(getContext(), 1)
+        );
+
+        adapter = new ListingAdapter(productList, product -> {
+
+            Bundle bundle = new Bundle();
+            bundle.putLong("productId", product.getId());
+
+            ProductDetailsFragment detailsFragment = new ProductDetailsFragment();
+            detailsFragment.setArguments(bundle);
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailsFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        binding.recyclerViewListing.setAdapter(adapter);
+    }
+
+    // ✅ API Call
+    private void loadProducts() {
+
         RetrofitClient.getProductApi()
                 .getProductsByCategory(categoryId)
                 .enqueue(new Callback<List<ProductDto>>() {
+
                     @Override
-                    public void onResponse(Call<List<ProductDto>> call, Response<List<ProductDto>> response) {
-                        if(response.isSuccessful() && response.body() != null){
+                    public void onResponse(Call<List<ProductDto>> call,
+                                           Response<List<ProductDto>> response) {
+
+                        showLoading(false);
+
+                        if (response.isSuccessful() && response.body() != null) {
+
                             productList.clear();
                             productList.addAll(response.body());
                             adapter.notifyDataSetChanged();
+
                         } else {
-                            Toast.makeText(getContext(),"Failed to load products",Toast.LENGTH_SHORT).show();
+                            showError("Failed to load products.");
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<List<ProductDto>> call, Throwable t) {
-                        Toast.makeText(getContext(),"Error: "+t.getMessage(),Toast.LENGTH_SHORT).show();
+                    public void onFailure(Call<List<ProductDto>> call,
+                                          Throwable t) {
+
+                        showLoading(false);
+                        showError("Error: " + t.getMessage());
                     }
                 });
+    }
+
+    // ✅ Shimmer Controller
+    private void showLoading(boolean isLoading) {
+
+        if (isLoading) {
+            binding.shimmerLayout.setVisibility(View.VISIBLE);
+            binding.shimmerLayout.startShimmer();
+            binding.recyclerViewListing.setVisibility(View.GONE);
+        } else {
+            binding.shimmerLayout.stopShimmer();
+            binding.shimmerLayout.setVisibility(View.GONE);
+            binding.recyclerViewListing.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // ✅ Error Message
+    private void showError(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    // ✅ Prevent memory leaks
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
