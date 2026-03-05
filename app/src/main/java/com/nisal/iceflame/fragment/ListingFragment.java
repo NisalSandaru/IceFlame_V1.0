@@ -21,6 +21,7 @@ import com.nisal.iceflame.network.RetrofitClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -149,7 +150,7 @@ public class ListingFragment extends Fragment {
 
     // ✅ Error Message
     private void showError(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        Toasty.error(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     // ✅ Prevent memory leaks

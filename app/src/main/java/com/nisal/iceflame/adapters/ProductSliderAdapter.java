@@ -1,0 +1,53 @@
+package com.nisal.iceflame.adapters;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.nisal.iceflame.R;
+
+import java.util.List;
+
+public class ProductSliderAdapter extends RecyclerView.Adapter<ProductSliderAdapter.productSliderViewHolder>{
+
+    private List<String> images;
+    public ProductSliderAdapter(List<String> images){
+
+        this.images = images;
+    }
+
+    @NonNull
+    @Override
+    public productSliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_slider_item, parent, false);
+        return new productSliderViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull productSliderViewHolder holder, int position) {
+        Glide.with(holder.itemView.getContext())
+                .load(images.get(position))
+                .centerCrop()
+                .into(holder.imageView);
+    }
+
+    @Override
+    public int getItemCount() {
+        return images.size();
+    }
+
+    public static class productSliderViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageView;
+
+        public productSliderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.product_slider_item_image);
+        }
+    }
+}
+

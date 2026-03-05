@@ -23,4 +23,5 @@ public class ProductDto {
     private String portionSize;
     private String createdAt;
     private String updatedAt;
+    private Integer kcal;
 }
