@@ -1,5 +1,8 @@
 package com.nisal.iceflame.adapters;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +15,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.nisal.iceflame.R;
+import com.nisal.iceflame.activity.LogInActivity;
+import com.nisal.iceflame.model.AddToCartRequest;
+import com.nisal.iceflame.model.CartDto;
 import com.nisal.iceflame.model.ProductDto;
+import com.nisal.iceflame.network.RetrofitClient;
 
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHolder> {
 
     private List<ProductDto> productList;
     private OnProductClickListener listener;
+    private Context context;
 
     // 👇 Interface for product click
     public interface OnProductClickListener {
@@ -27,7 +40,8 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
     }
 
     // 👇 Constructor with listener
-    public ListingAdapter(List<ProductDto> productList, OnProductClickListener listener){
+    public ListingAdapter(Context context, List<ProductDto> productList, OnProductClickListener listener){
+        this.context = context;
         this.productList = productList;
         this.listener = listener;
     }
@@ -89,10 +103,68 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
                             v.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
                     ).start();
 
+            addToCartLogic(product);
+
             Toast.makeText(holder.itemView.getContext(),
                     "Added to cart 🛒",
                     Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void addToCartLogic(ProductDto product){
+
+        SharedPreferences prefs =
+                context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
+        long userId = prefs.getLong("user_id", -1);
+
+        // 🚨 User not logged in
+        if(userId == -1){
+
+            Toasty.error(context,
+                    "Please login first",
+                    Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(context, LogInActivity.class);
+            context.startActivity(intent);
+
+            return;
+        }
+
+        AddToCartRequest request = AddToCartRequest.builder()
+                .productId(product.getId())
+                .quantity(1)
+                .build();
+
+        RetrofitClient.getCartApi()
+                .addToCart(userId, request)
+                .enqueue(new Callback<CartDto>() {
+
+                    @Override
+                    public void onResponse(Call<CartDto> call, Response<CartDto> response) {
+
+                        if(response.isSuccessful()){
+
+                            Toasty.success(context,
+                                    "Added to cart 🛒",
+                                    Toast.LENGTH_SHORT).show();
+
+                        } else {
+
+                            Toasty.error(context,
+                                    "Failed to add to cart",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartDto> call, Throwable t) {
+
+                        Toasty.error(context,
+                                t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override

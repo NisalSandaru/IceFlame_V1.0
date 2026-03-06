@@ -1,5 +1,7 @@
 package com.nisal.iceflame.fragment;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,11 +15,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.nisal.iceflame.R;
+import com.nisal.iceflame.activity.LogInActivity;
+import com.nisal.iceflame.activity.OnboardingActivity;
+import com.nisal.iceflame.activity.SplashActivity;
 import com.nisal.iceflame.adapters.ProductSliderAdapter;
 import com.nisal.iceflame.databinding.FragmentProductDetailsBinding;
+import com.nisal.iceflame.model.AddToCartRequest;
+import com.nisal.iceflame.model.CartDto;
 import com.nisal.iceflame.model.ProductDto;
 import com.nisal.iceflame.network.RetrofitClient;
 
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -153,12 +161,69 @@ public class ProductDetailsFragment extends Fragment {
 
             if (currentProduct == null) return;
 
-            // Example:
-            // CartManager.addToCart(currentProduct, quantity);
+            SharedPreferences prefs = requireActivity()
+                    .getSharedPreferences("prefs", getContext().MODE_PRIVATE);
 
-            Toast.makeText(getContext(),
-                    "Added to cart",
-                    Toast.LENGTH_SHORT).show();
+            Long userId = prefs.getLong("user_id", -1);
+
+            // 🚨 User not logged in
+            if (userId == -1) {
+
+                Toasty.error(getContext(),
+                        "Please login first",
+                        Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getContext(), LogInActivity.class);
+                startActivity(intent);
+
+                return; // ❗ stop execution
+            }
+
+            AddToCartRequest request = AddToCartRequest.builder()
+                    .productId(currentProduct.getId())
+                    .quantity(quantity)
+                    .build();
+
+            RetrofitClient.getCartApi()
+                    .addToCart(userId, request)
+                    .enqueue(new Callback<CartDto>() {
+
+                        @Override
+                        public void onResponse(Call<CartDto> call, Response<CartDto> response) {
+
+                            if (!isAdded()) return;
+
+                            if (response.isSuccessful()) {
+
+                                Toasty.success(
+                                        getContext(),
+                                        "Added to cart",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                            } else {
+
+                                Toasty.error(
+                                        getContext(),
+                                        "Failed to add to cart",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CartDto> call, Throwable t) {
+
+                            if (!isAdded()) return;
+
+                            Toasty.error(
+                                    getContext(),
+                                    t.getMessage(),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    });
+
         });
     }
 

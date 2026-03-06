@@ -81,7 +81,7 @@ public class ListingFragment extends Fragment {
                 new GridLayoutManager(getContext(), 1)
         );
 
-        adapter = new ListingAdapter(productList, product -> {
+        adapter = new ListingAdapter(requireContext(), productList, product -> {
 
             Bundle bundle = new Bundle();
             bundle.putLong("productId", product.getId());

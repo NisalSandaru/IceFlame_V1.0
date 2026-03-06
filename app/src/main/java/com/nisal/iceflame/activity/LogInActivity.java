@@ -61,6 +61,7 @@ public class LogInActivity extends AppCompatActivity {
                         // Save user info locally
                         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
+                        editor.putLong("user_id", user.getId());
                         editor.putString("user_email", user.getEmail());
                         editor.putString("user_name", user.getFullName());
                         editor.apply();
