@@ -27,6 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.nisal.iceflame.R;
 import com.nisal.iceflame.databinding.ActivityMainBinding;
 import com.nisal.iceflame.databinding.SideNavHeaderBinding;
+import com.nisal.iceflame.fragment.CartFragment;
 import com.nisal.iceflame.fragment.ExploreFragment;
 import com.nisal.iceflame.fragment.HomeFragment;
 import com.nisal.iceflame.fragment.ProfileFragment;
@@ -114,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.bottom_nav_category) {
             loadFragment(new ExploreFragment());
             bottomNavigationView.getMenu().findItem(R.id.bottom_nav_category).setChecked(true);
+        } else if (itemId == R.id.bottom_nav_cart) {
+            loadFragment(new CartFragment());
+            bottomNavigationView.getMenu().findItem(R.id.bottom_nav_cart).setChecked(true);
         }
         return true;
     }
