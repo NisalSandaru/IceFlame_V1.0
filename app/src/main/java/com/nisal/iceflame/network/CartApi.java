@@ -22,26 +22,26 @@ public interface CartApi {
             );
 
     // GET USER CART
-    @GET("api/cart/{userId}")
+    @GET("api/v1.0/cart/{userId}")
     Call<CartDto> getCart(
             @Path("userId") Long userId
     );
 
     // UPDATE QUANTITY
-    @PUT("api/cart/update")
+    @PUT("api/v1.0/cart/update")
     Call<CartDto> updateQuantity(
             @Query("cartItemId") Long cartItemId,
             @Query("quantity") int quantity
     );
 
     // REMOVE ITEM
-    @DELETE("api/cart/remove/{cartItemId}")
+    @DELETE("api/v1.0/cart/remove/{cartItemId}")
     Call<CartDto> removeItem(
             @Path("cartItemId") Long cartItemId
     );
 
     // CLEAR CART
-    @DELETE("api/cart/clear/{userId}")
+    @DELETE("api/v1.0/cart/clear/{userId}")
     Call<String> clearCart(
             @Path("userId") Long userId
     );
