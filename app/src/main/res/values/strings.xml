@@ -25,4 +25,8 @@
     <string name="notification">Notification</string>
     <string name="name">Full Name</string>
     <string name="name_hint">Jhone Snow</string>
+    <string name="your_wishlist_is_empty">Your Wishlist is empty</string>
+    <string name="add_something_delicious_to_your_wishlist">Add something delicious to your wishlist.</string>
+    <string name="your_cart_is_empty">Your cart is empty</string>
+    <string name="add_something_delicious_to_your_cart">Add something delicious to your cart.</string>
 </resources>

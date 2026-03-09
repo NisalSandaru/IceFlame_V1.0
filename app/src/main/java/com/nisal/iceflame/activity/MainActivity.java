@@ -31,6 +31,7 @@ import com.nisal.iceflame.fragment.CartFragment;
 import com.nisal.iceflame.fragment.ExploreFragment;
 import com.nisal.iceflame.fragment.HomeFragment;
 import com.nisal.iceflame.fragment.ProfileFragment;
+import com.nisal.iceflame.fragment.WishlistFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener{
 
@@ -118,6 +119,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.bottom_nav_cart) {
             loadFragment(new CartFragment());
             bottomNavigationView.getMenu().findItem(R.id.bottom_nav_cart).setChecked(true);
+        } else if (itemId == R.id.bottom_nav_watchlist) {
+            loadFragment(new WishlistFragment());
+            bottomNavigationView.getMenu().findItem(R.id.bottom_nav_watchlist).setChecked(true);
         }
         return true;
     }

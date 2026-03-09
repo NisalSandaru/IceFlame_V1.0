@@ -8,9 +8,11 @@
     <!-- 🛒 TITLE -->
     <TextView
         android:id="@+id/tvCartTitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cart"
+        android:drawablePadding="8dp"
+        app:drawableStartCompat="@drawable/shopping_cart_24px"
         android:textStyle="bold"
         android:textSize="20sp"
         android:gravity="center"

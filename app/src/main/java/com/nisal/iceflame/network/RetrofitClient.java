@@ -42,4 +42,8 @@ public class RetrofitClient {
     public static CartApi getCartApi() {
         return getRetrofitInstance().create(CartApi.class);
     }
+
+    public static WishlistApi getWishlistApi() {
+        return getRetrofitInstance().create(WishlistApi.class);
+    }
 }

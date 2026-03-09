@@ -89,7 +89,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
             }
         });
 
-        // ❤️ Wishlist animation
+        // ❤️ WishlistDto animation
         holder.btnWishlist.setOnClickListener(v -> {
 
             v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100)
