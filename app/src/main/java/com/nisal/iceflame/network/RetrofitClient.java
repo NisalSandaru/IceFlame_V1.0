@@ -46,4 +46,8 @@ public class RetrofitClient {
     public static WishlistApi getWishlistApi() {
         return getRetrofitInstance().create(WishlistApi.class);
     }
+
+    public static UserApi getUserApi() {
+        return getRetrofitInstance().create(UserApi.class);
+    }
 }

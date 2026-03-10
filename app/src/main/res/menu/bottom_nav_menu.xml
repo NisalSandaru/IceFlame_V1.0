@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/bottom_nav_category"
-        android:icon="@drawable/orders_24px"
+        android:icon="@drawable/explore_24px"
         android:title="@string/category" />
 
     <item
@@ -25,4 +25,9 @@
         android:id="@+id/bottom_nav_notification"
         android:icon="@drawable/notifications_24px"
         android:title="@string/notification" />
+
+    <item
+        android:id="@+id/bottom_nav_setting"
+        android:icon="@drawable/settings_24px"
+        android:title="@string/settings" />
 </menu>
