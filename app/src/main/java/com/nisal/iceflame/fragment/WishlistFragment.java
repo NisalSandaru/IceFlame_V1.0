@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.nisal.iceflame.R;
 import com.nisal.iceflame.activity.LogInActivity;
 import com.nisal.iceflame.adapters.WishlistAdapter;
 import com.nisal.iceflame.databinding.FragmentWishlistBinding;
@@ -70,6 +71,18 @@ public class WishlistFragment extends Fragment {
                 item -> removeFromWishlist(item),
                 productId -> {
                     // TODO: open product details page
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("productId", productId);
+
+                    ProductDetailsFragment detailsFragment = new ProductDetailsFragment();
+                    detailsFragment.setArguments(bundle);
+
+                    requireActivity()
+                            .getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, detailsFragment)
+                            .addToBackStack(null)
+                            .commit();
                 }
         );
 

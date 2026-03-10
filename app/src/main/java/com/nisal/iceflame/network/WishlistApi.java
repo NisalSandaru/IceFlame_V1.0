@@ -22,10 +22,11 @@ public interface WishlistApi {
             @Path("userId") Long userId
     );
 
-    @DELETE("api/v1.0/wishlist/remove/{wishItemId}")
+    @DELETE("api/v1.0/wishlist/remove")
     Call<WishlistDto> removeWishItem(
-            @Path("wishItemId") Long wishItemId,
-            Long productId);
+            @Query("userId") Long userId,
+            @Query("productId") Long productId
+    );
 
     // CLEAR CART
     @DELETE("api/v1.0/wishlist/clear/{userId}")

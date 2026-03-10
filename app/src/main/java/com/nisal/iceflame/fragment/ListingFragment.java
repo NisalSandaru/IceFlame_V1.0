@@ -1,5 +1,7 @@
 package com.nisal.iceflame.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +18,14 @@ import com.nisal.iceflame.R;
 import com.nisal.iceflame.adapters.ListingAdapter;
 import com.nisal.iceflame.databinding.FragmentListingBinding;
 import com.nisal.iceflame.model.ProductDto;
+import com.nisal.iceflame.model.WishItemDto;
+import com.nisal.iceflame.model.WishlistDto;
 import com.nisal.iceflame.network.RetrofitClient;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
@@ -31,6 +37,7 @@ public class ListingFragment extends Fragment {
     private FragmentListingBinding binding;
     private ListingAdapter adapter;
     private Long categoryId = 0L;
+    private Set<Long> wishlistIds = new HashSet<>();
     private final List<ProductDto> productList = new ArrayList<>();
 
     @Override
@@ -60,6 +67,7 @@ public class ListingFragment extends Fragment {
         setupRecyclerView();
         showLoading(true);
         loadProducts();
+        loadWishlist();
 
         // ✅ Handle back press properly
         requireActivity().getOnBackPressedDispatcher()
@@ -72,6 +80,43 @@ public class ListingFragment extends Fragment {
                                         .popBackStack();
                             }
                         });
+    }
+
+    private void loadWishlist() {
+
+        SharedPreferences prefs =
+                requireContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
+        long userId = prefs.getLong("user_id", -1);
+
+        if(userId == -1) return;
+
+        RetrofitClient.getWishlistApi()
+                .getWishlist(userId)
+                .enqueue(new Callback<WishlistDto>() {
+
+                    @Override
+                    public void onResponse(Call<WishlistDto> call, Response<WishlistDto> response) {
+
+                        if(response.isSuccessful() && response.body()!=null){
+
+                            wishlistIds.clear();
+
+                            if(response.body().getItems()!=null){
+                                for(WishItemDto item : response.body().getItems()){
+                                    wishlistIds.add(item.getProductId());
+                                }
+                            }
+
+                            adapter.setWishlistIds(wishlistIds);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WishlistDto> call, Throwable t) {
+
+                    }
+                });
     }
 
     // ✅ Setup RecyclerView

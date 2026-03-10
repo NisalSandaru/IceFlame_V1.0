@@ -168,7 +168,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@null"
-            android:src="@drawable/favorite_24px"/>
+            android:src="@drawable/favorite_24px"
+            app:tint="#E91E63" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddToCart"

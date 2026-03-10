@@ -23,6 +23,8 @@ import com.nisal.iceflame.databinding.FragmentProductDetailsBinding;
 import com.nisal.iceflame.model.AddToCartRequest;
 import com.nisal.iceflame.model.CartDto;
 import com.nisal.iceflame.model.ProductDto;
+import com.nisal.iceflame.model.WishItemDto;
+import com.nisal.iceflame.model.WishlistDto;
 import com.nisal.iceflame.network.RetrofitClient;
 
 import es.dmoral.toasty.Toasty;
@@ -69,6 +71,7 @@ public class ProductDetailsFragment extends Fragment {
         setupAddToCart();
 
         loadProduct();
+        loadWishlistState();
     }
 
     // 🔥 Load Product From API
@@ -143,14 +146,85 @@ public class ProductDetailsFragment extends Fragment {
 
     // 🔥 Watchlist Toggle
     private void setupWatchlist() {
-        binding.btnWatchlist.setOnClickListener(v -> {
-            isWatchlisted = !isWatchlisted;
 
-            if (isWatchlisted) {
-                binding.btnWatchlist.setImageResource(R.drawable.favorite_fill);
-            } else {
-                binding.btnWatchlist.setImageResource(R.drawable.favorite_24px);
+        binding.btnWatchlist.setOnClickListener(v -> {
+
+            SharedPreferences prefs = requireActivity()
+                    .getSharedPreferences("prefs", getContext().MODE_PRIVATE);
+
+            Long userId = prefs.getLong("user_id", -1);
+
+            if(userId == -1){
+
+                Toasty.error(getContext(),
+                        "Please login first",
+                        Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(getContext(), LogInActivity.class));
+                return;
             }
+
+            if(isWatchlisted){
+
+                // REMOVE FROM WISHLIST
+                RetrofitClient.getWishlistApi()
+                        .removeWishItem(userId, productId)
+                        .enqueue(new Callback<WishlistDto>() {
+
+                            @Override
+                            public void onResponse(Call<WishlistDto> call, Response<WishlistDto> response) {
+
+                                if(response.isSuccessful()){
+
+                                    isWatchlisted = false;
+                                    binding.btnWatchlist.setImageResource(R.drawable.favorite_24px);
+
+                                    Toasty.info(getContext(),
+                                            "Removed from wishlist",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<WishlistDto> call, Throwable t) {
+
+                                Toasty.error(getContext(),
+                                        t.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+            }else{
+
+                // ADD TO WISHLIST
+                RetrofitClient.getWishlistApi()
+                        .addToWishlist(userId, productId)
+                        .enqueue(new Callback<WishlistDto>() {
+
+                            @Override
+                            public void onResponse(Call<WishlistDto> call, Response<WishlistDto> response) {
+
+                                if(response.isSuccessful()){
+
+                                    isWatchlisted = true;
+                                    binding.btnWatchlist.setImageResource(R.drawable.favorite_fill);
+
+                                    Toasty.success(getContext(),
+                                            "Added to wishlist ❤️",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<WishlistDto> call, Throwable t) {
+
+                                Toasty.error(getContext(),
+                                        t.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+
         });
     }
 
@@ -225,6 +299,44 @@ public class ProductDetailsFragment extends Fragment {
                     });
 
         });
+    }
+
+    private void loadWishlistState() {
+
+        SharedPreferences prefs = requireActivity()
+                .getSharedPreferences("prefs", getContext().MODE_PRIVATE);
+
+        Long userId = prefs.getLong("user_id", -1);
+
+        if(userId == -1) return;
+
+        RetrofitClient.getWishlistApi()
+                .getWishlist(userId)
+                .enqueue(new Callback<WishlistDto>() {
+                    @Override
+                    public void onResponse(Call<WishlistDto> call, Response<WishlistDto> response) {
+
+                        if(response.isSuccessful() && response.body()!=null){
+
+                            if(response.body().getItems()!=null){
+
+                                for(WishItemDto item : response.body().getItems()){
+
+                                    if(item.getProductId().equals(productId)){
+                                        isWatchlisted = true;
+                                        binding.btnWatchlist.setImageResource(R.drawable.favorite_fill);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WishlistDto> call, Throwable t) {
+
+                    }
+                });
     }
 
     // 🔥 Back Press Handling
