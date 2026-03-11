@@ -74,12 +74,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            return false;
 //        });
 
-        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+//        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//                    drawerLayout.closeDrawer(GravityCompat.START);
+//                }else {
+//                    finish();
+//                }
+//            }
+//        });
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
-                }else {
+                    return;
+                }
+
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
+                } else {
                     finish();
                 }
             }
@@ -130,14 +146,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+//    private void loadFragment(Fragment fragment){
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//        transaction.replace(R.id.fragment_container, fragment);
+//        transaction.commit();
+//
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+//
+//    }
+
     private void loadFragment(Fragment fragment){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-
     }
 
 }

@@ -17,6 +17,7 @@ public class User {
     private String email;
     private String password;        // usually optional for frontend
     private String profileImageUrl;
+    private String mobileNumber;
     private String role;
     private Boolean isActive;
     private String createdAt;

@@ -64,6 +64,38 @@ public class SettingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         loadUser();
+        goMyProfile();
+        goAddress();
+    }
+
+    private void goAddress(){
+
+        binding.btnMyProfile.setOnClickListener(v->{
+            Fragment fragment = new ProfileFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new ProfileFragment())
+                    .addToBackStack("address")
+                    .commit();
+        });
+
+    }
+
+    private void goMyProfile(){
+
+        binding.btnMyProfile.setOnClickListener(v->{
+            Fragment fragment = new ProfileFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new ProfileFragment())
+                    .addToBackStack("profile")
+                    .commit();
+        });
+
     }
 
     private void loadUser(){
