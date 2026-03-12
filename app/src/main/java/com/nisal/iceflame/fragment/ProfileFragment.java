@@ -136,6 +136,16 @@ public class ProfileFragment extends Fragment {
 
         binding.btnSaveProfile.setOnClickListener(v -> {
 
+
+            if (binding.etFullName.getText() == null){
+                Toasty.error(getContext(),"Full name can't be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (binding.etMobile.getText() == null){
+                Toasty.error(getContext(),"Mobile can't be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             user.setFullName(binding.etFullName.getText().toString());
             user.setMobileNumber(binding.etMobile.getText().toString());
 

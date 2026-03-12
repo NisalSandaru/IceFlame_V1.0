@@ -50,4 +50,8 @@ public class RetrofitClient {
     public static UserApi getUserApi() {
         return getRetrofitInstance().create(UserApi.class);
     }
+
+    public static AddressApi getAddressApi() {
+        return getRetrofitInstance().create(AddressApi.class);
+    }
 }

@@ -34,6 +34,7 @@
                 android:layout_margin="6dp"
                 android:padding="6dp"
                 android:src="@drawable/photo_camera"
+                android:backgroundTint="@color/md_theme_onPrimary"
                 android:background="@drawable/custom_input_search"/>
 
         </FrameLayout>

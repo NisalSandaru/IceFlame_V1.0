@@ -70,13 +70,13 @@ public class SettingFragment extends Fragment {
 
     private void goAddress(){
 
-        binding.btnMyProfile.setOnClickListener(v->{
-            Fragment fragment = new ProfileFragment();
+        binding.btnAddress.setOnClickListener(v->{
+            Fragment fragment = new AddressFragment();
 
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new ProfileFragment())
+                    .replace(R.id.fragment_container, new AddressFragment())
                     .addToBackStack("address")
                     .commit();
         });
