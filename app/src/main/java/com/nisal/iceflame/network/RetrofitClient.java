@@ -54,4 +54,8 @@ public class RetrofitClient {
     public static AddressApi getAddressApi() {
         return getRetrofitInstance().create(AddressApi.class);
     }
+
+    public static OrderApi getOrderApi() {
+        return getRetrofitInstance().create(OrderApi.class);
+    }
 }
