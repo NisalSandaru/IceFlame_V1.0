@@ -49,16 +49,13 @@ public class CheckoutFragment extends Fragment {
     private CheckoutAddressAdapter adapter;
 
     private Long userId;
+    private Long createdOrderId = null;
 
     private double totalAmount = 0;
 
     private PaymentMethod selectedPayment = PaymentMethod.COD;
 
-    // prevent double payment
     private boolean paymentInProgress = false;
-
-    // store request until payment completes
-    private CheckoutRequest pendingCheckoutRequest;
 
     @Nullable
     @Override
@@ -89,7 +86,6 @@ public class CheckoutFragment extends Fragment {
                 new LinearLayoutManager(getContext()));
 
         adapter = new CheckoutAddressAdapter(addresses);
-
         binding.addressRecycler.setAdapter(adapter);
     }
 
@@ -126,19 +122,29 @@ public class CheckoutFragment extends Fragment {
         RetrofitClient.getAddressApi()
                 .getUserAddresses(userId)
                 .enqueue(new Callback<List<AddressDto>>() {
+
                     @Override
                     public void onResponse(Call<List<AddressDto>> call, Response<List<AddressDto>> response) {
 
-                        if (response.isSuccessful() && response.body() != null) {
+                        if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
 
                             addresses.clear();
                             addresses.addAll(response.body());
                             adapter.notifyDataSetChanged();
 
                         } else {
-
+                            // No addresses found → redirect to AddressFragment
                             Toasty.warning(requireContext(),
-                                    "No addresses found", Toasty.LENGTH_SHORT).show();
+                                    "Please add an address first",
+                                    Toasty.LENGTH_SHORT).show();
+
+                            // Redirect to AddressFragment
+                            requireActivity()
+                                    .getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, new AddressFragment())
+                                    .addToBackStack(null)
+                                    .commit();
                         }
                     }
 
@@ -146,7 +152,8 @@ public class CheckoutFragment extends Fragment {
                     public void onFailure(Call<List<AddressDto>> call, Throwable t) {
 
                         Toasty.error(requireContext(),
-                                "Failed to load addresses", Toasty.LENGTH_SHORT).show();
+                                "Failed to load addresses",
+                                Toasty.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -156,6 +163,7 @@ public class CheckoutFragment extends Fragment {
         RetrofitClient.getCartApi()
                 .getCart(userId)
                 .enqueue(new Callback<CartDto>() {
+
                     @Override
                     public void onResponse(Call<CartDto> call, Response<CartDto> response) {
 
@@ -164,7 +172,6 @@ public class CheckoutFragment extends Fragment {
                             cartItems.clear();
 
                             if (response.body().getItems() != null) {
-
                                 cartItems.addAll(response.body().getItems());
                             }
 
@@ -176,7 +183,8 @@ public class CheckoutFragment extends Fragment {
                     public void onFailure(Call<CartDto> call, Throwable t) {
 
                         Toasty.error(requireContext(),
-                                "Failed to load cart", Toasty.LENGTH_SHORT).show();
+                                "Failed to load cart",
+                                Toasty.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -210,8 +218,8 @@ public class CheckoutFragment extends Fragment {
         if (addressId == null) {
 
             Toasty.warning(requireContext(),
-                    "Please select an address", Toasty.LENGTH_SHORT).show();
-
+                    "Please select an address",
+                    Toasty.LENGTH_SHORT).show();
             return;
         }
 
@@ -220,18 +228,53 @@ public class CheckoutFragment extends Fragment {
         request.setAddressId(addressId);
         request.setPaymentMethod(selectedPayment.name());
 
-        pendingCheckoutRequest = request;
+        createOrder(request);
+    }
+
+    private void createOrder(CheckoutRequest request) {
 
         binding.btnPlaceOrder.setEnabled(false);
 
-        if (selectedPayment == PaymentMethod.COD) {
+        RetrofitClient.getOrderApi()
+                .createOrder(request)
+                .enqueue(new Callback<OrderDto>() {
 
-            callCheckoutApi(request);
+                    @Override
+                    public void onResponse(Call<OrderDto> call, Response<OrderDto> response) {
 
-        } else {
+                        if (response.isSuccessful() && response.body() != null) {
 
-            launchPayHerePayment();
-        }
+                            createdOrderId = response.body().getId();
+
+                            if (selectedPayment == PaymentMethod.COD) {
+
+                                confirmPayment(createdOrderId);
+
+                            } else {
+
+                                launchPayHerePayment();
+                            }
+
+                        } else {
+
+                            binding.btnPlaceOrder.setEnabled(true);
+
+                            Toasty.error(requireContext(),
+                                    "Order creation failed",
+                                    Toasty.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<OrderDto> call, Throwable t) {
+
+                        binding.btnPlaceOrder.setEnabled(true);
+
+                        Toasty.error(requireContext(),
+                                t.getMessage(),
+                                Toasty.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void launchPayHerePayment() {
@@ -246,7 +289,8 @@ public class CheckoutFragment extends Fragment {
 
         req.setCurrency("LKR");
         req.setAmount(totalAmount);
-        req.setOrderId("ICE-" + System.currentTimeMillis());
+
+        req.setOrderId("ICE-" + createdOrderId);
         req.setItemsDescription("IceFlame Order");
 
         req.getCustomer().setFirstName("Ice");
@@ -269,7 +313,6 @@ public class CheckoutFragment extends Fragment {
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
 
-                        binding.btnPlaceOrder.setEnabled(true);
                         paymentInProgress = false;
 
                         if (result.getResultCode() == getActivity().RESULT_OK
@@ -282,33 +325,47 @@ public class CheckoutFragment extends Fragment {
                             if (response != null && response.isSuccess()) {
 
                                 Toasty.success(requireContext(),
-                                        "Payment Success!", Toasty.LENGTH_SHORT).show();
+                                        "Payment Success!",
+                                        Toasty.LENGTH_SHORT).show();
 
-                                callCheckoutApi(pendingCheckoutRequest);
+                                confirmPayment(createdOrderId);
 
                             } else {
 
+                                binding.btnPlaceOrder.setEnabled(true);
+
                                 Toasty.error(requireContext(),
-                                        "Payment Failed", Toasty.LENGTH_SHORT).show();
+                                        "Payment Failed",
+                                        Toasty.LENGTH_SHORT).show();
                             }
 
                         } else {
 
+                            binding.btnPlaceOrder.setEnabled(true);
+
                             Toasty.warning(requireContext(),
-                                    "Payment Cancelled", Toasty.LENGTH_SHORT).show();
+                                    "Payment Cancelled",
+                                    Toasty.LENGTH_SHORT).show();
                         }
                     });
 
-    private void callCheckoutApi(CheckoutRequest request) {
+
+    private void confirmPayment(Long orderId) {
 
         RetrofitClient.getOrderApi()
-                .checkout(request)
+                .confirmPayment(orderId)
                 .enqueue(new Callback<OrderDto>() {
 
                     @Override
                     public void onResponse(Call<OrderDto> call, Response<OrderDto> response) {
 
-                        if (response.isSuccessful() && response.body() != null) {
+                        binding.btnPlaceOrder.setEnabled(true);
+
+                        System.out.println("CONFIRM RESPONSE CODE: " + response.code());
+                        System.out.println("CONFIRM BODY: " + response.body());
+                        System.out.println("CONFIRM ERROR: " + response.errorBody());
+
+                        if (response.isSuccessful()) {
 
                             Toasty.success(requireContext(),
                                     "Order placed successfully",
@@ -316,12 +373,14 @@ public class CheckoutFragment extends Fragment {
 
                             requireActivity()
                                     .getSupportFragmentManager()
-                                    .popBackStack();
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, new PaymentPlacedFragment())
+                                    .commit();
 
                         } else {
 
                             Toasty.error(requireContext(),
-                                    "Checkout failed",
+                                    "Payment confirmation failed (" + response.code() + ")",
                                     Toasty.LENGTH_LONG).show();
                         }
                     }
@@ -329,8 +388,10 @@ public class CheckoutFragment extends Fragment {
                     @Override
                     public void onFailure(Call<OrderDto> call, Throwable t) {
 
+                        binding.btnPlaceOrder.setEnabled(true);
+
                         Toasty.error(requireContext(),
-                                "Checkout error: " + t.getMessage(),
+                                t.getMessage(),
                                 Toasty.LENGTH_LONG).show();
                     }
                 });
