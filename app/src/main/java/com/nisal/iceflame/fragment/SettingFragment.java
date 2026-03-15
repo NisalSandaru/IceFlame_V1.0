@@ -66,6 +66,7 @@ public class SettingFragment extends Fragment {
         loadUser();
         goMyProfile();
         goAddress();
+        goMyOrders();
     }
 
     private void goAddress(){
@@ -93,6 +94,21 @@ public class SettingFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.fragment_container, new ProfileFragment())
                     .addToBackStack("profile")
+                    .commit();
+        });
+
+    }
+
+    private void goMyOrders(){
+
+        binding.btnMyOrders.setOnClickListener(v->{
+            Fragment fragment = new MyOrdersFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new MyOrdersFragment())
+                    .addToBackStack("orders")
                     .commit();
         });
 

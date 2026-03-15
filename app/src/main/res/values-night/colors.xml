@@ -140,4 +140,23 @@
     <color name="md_theme_surfaceContainer_highContrast">#313030</color>
     <color name="md_theme_surfaceContainerHigh_highContrast">#3C3B3B</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#474646</color>
+
+
+    <color name="status_pending_bg">#FFF3E0</color>
+    <color name="status_pending_text">#EF6C00</color>
+
+    <color name="status_confirmed_bg">#E8F5E9</color>
+    <color name="status_confirmed_text">#2E7D32</color>
+
+    <color name="status_processing_bg">#E3F2FD</color>
+    <color name="status_processing_text">#1565C0</color>
+
+    <color name="status_shipped_bg">#E1F5FE</color>
+    <color name="status_shipped_text">#0277BD</color>
+
+    <color name="status_delivered_bg">#E8F5E9</color>
+    <color name="status_delivered_text">#1B5E20</color>
+
+    <color name="status_cancelled_bg">#FFEBEE</color>
+    <color name="status_cancelled_text">#C62828</color>
 </resources>

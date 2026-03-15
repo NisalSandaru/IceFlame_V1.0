@@ -160,6 +160,7 @@ public class CartFragment extends Fragment {
 
     // Update total price
     private void updateTotal() {
+        if (binding == null) return;
         double subtotal = 0;
         for (CartItemDto item : cartItems) {
             subtotal += item.getPrice() * item.getQuantity();
@@ -173,6 +174,7 @@ public class CartFragment extends Fragment {
 
     // Show empty cart view if needed
     private void checkCartItems() {
+        if (binding == null) return;
         if (cartItems.isEmpty()) {
             binding.cartRecycler.setVisibility(View.GONE);
             binding.emptyCartView.getRoot().setVisibility(View.VISIBLE);
