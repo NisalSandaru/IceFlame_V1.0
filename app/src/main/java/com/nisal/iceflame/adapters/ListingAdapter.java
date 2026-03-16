@@ -185,59 +185,6 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
         });
     }
 
-//    private void toggleWishlist(ProductDto product, ImageView btnWishlist) {
-//
-//        SharedPreferences prefs =
-//                context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-//
-//        long userId = prefs.getLong("user_id", -1);
-//
-//        if (userId == -1) {
-//
-//            Toasty.error(context,
-//                    "Please login first",
-//                    Toast.LENGTH_SHORT).show();
-//
-//            context.startActivity(new Intent(context, LogInActivity.class));
-//            return;
-//        }
-//
-//        RetrofitClient.getWishlistApi()
-//                .toggleWishlist(userId, product.getId())
-//                .enqueue(new Callback<WishlistDto>() {
-//
-//                    @Override
-//                    public void onResponse(Call<WishlistDto> call,
-//                                           Response<WishlistDto> response) {
-//
-//                        if (response.isSuccessful()) {
-//
-//                            boolean isFavorite = product.isFavorite();
-//
-//                            product.setFavorite(!isFavorite);
-//
-//                            if (product.isFavorite()) {
-//                                btnWishlist.setImageResource(R.drawable.favorite_fill);
-//                            } else {
-//                                btnWishlist.setImageResource(R.drawable.favorite_24px);
-//                            }
-//
-//                            Toasty.success(context,
-//                                    "Wishlist updated ❤️",
-//                                    Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<WishlistDto> call, Throwable t) {
-//
-//                        Toasty.error(context,
-//                                t.getMessage(),
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
-
     private void addToCartLogic(ProductDto product){
 
         SharedPreferences prefs =

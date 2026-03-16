@@ -23,4 +23,7 @@ public interface OrderApi {
 
     @GET("/api/v1.0/orders/user/{userId}/previous")
     Call<List<OrderDto>> getPreviousOrders(@Path("userId") Long userId);
+
+    @GET("/api/v1.0/orders/getById/{orderId}")
+    Call<OrderDto> getById(@Path("orderId") Long orderId);
 }

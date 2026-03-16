@@ -40,7 +40,23 @@ public class PreviousOrdersFragment extends Fragment {
         binding = FragmentPreviousOrdersBinding.inflate(inflater, container, false);
 
         // Set LayoutManager and Adapter before loading data
-        adapter = new OrdersAdapter(previousOrders);
+        adapter = new OrdersAdapter(previousOrders, order -> {
+
+            Bundle bundle = new Bundle();
+            bundle.putLong("orderId", order.getId());
+
+            OrderDetailsFragment fragment = new OrderDetailsFragment();
+            fragment.setArguments(bundle);
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
         binding.recyclerOrders.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerOrders.setAdapter(adapter);
 

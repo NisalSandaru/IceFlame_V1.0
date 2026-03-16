@@ -3,6 +3,7 @@ package com.nisal.iceflame.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -16,12 +17,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
+
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder> {
 
     private List<OrderDto> orders;
+    private OnOrderClickListener listener;
 
-    public OrdersAdapter(List<OrderDto> orders) {
+    public interface OnOrderClickListener{
+        void onOrderClick(OrderDto order);
+    }
+
+    public OrdersAdapter(List<OrderDto> orders, OnOrderClickListener listener) {
         this.orders = orders;
+        this.listener = listener;
     }
 
     @NonNull
@@ -65,8 +74,10 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
         // --- Progress Stepper UI ---
         setupProgressStepper(holder, status, context);
 
-        holder.binding.orderCard.setOnClickListener(v->{
-
+        holder.binding.orderCard.setOnClickListener(v -> {
+            if(listener != null){
+                listener.onOrderClick(order);
+            }
         });
     }
 

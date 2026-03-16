@@ -2,9 +2,11 @@ package com.nisal.iceflame.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -24,6 +26,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.nisal.iceflame.R;
 import com.nisal.iceflame.databinding.ActivityMainBinding;
 import com.nisal.iceflame.databinding.SideNavHeaderBinding;
@@ -33,6 +36,8 @@ import com.nisal.iceflame.fragment.HomeFragment;
 import com.nisal.iceflame.fragment.ProfileFragment;
 import com.nisal.iceflame.fragment.SettingFragment;
 import com.nisal.iceflame.fragment.WishlistFragment;
+
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener{
 
@@ -57,6 +62,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = binding.toolbar;
         navigationView = binding.sideNavigationView;
         bottomNavigationView = binding.bottomNavigationView;
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+
+                    if (!task.isSuccessful()) return;
+
+                    String token = task.getResult();
+
+                    Log.d("FCM_TOKEN", token);
+                    Toasty.success(this,"Please login first", Toast.LENGTH_SHORT).show();
+                });
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(new String[]{
+                    android.Manifest.permission.POST_NOTIFICATIONS
+            }, 1);
+        }
 
         setSupportActionBar(toolbar);
 

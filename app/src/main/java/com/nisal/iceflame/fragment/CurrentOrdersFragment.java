@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.nisal.iceflame.R;
 import com.nisal.iceflame.adapters.OrdersAdapter;
 import com.nisal.iceflame.databinding.FragmentCurrentOrdersBinding;
 import com.nisal.iceflame.model.OrderDto;
@@ -41,7 +42,23 @@ public class CurrentOrdersFragment extends Fragment {
         binding = FragmentCurrentOrdersBinding.inflate(inflater, container, false);
 
         // Setup RecyclerView
-        adapter = new OrdersAdapter(currentOrders);
+        adapter = new OrdersAdapter(currentOrders, order -> {
+
+            Bundle bundle = new Bundle();
+            bundle.putLong("orderId", order.getId());
+
+            OrderDetailsFragment fragment = new OrderDetailsFragment();
+            fragment.setArguments(bundle);
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
         binding.recyclerOrders.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerOrders.setAdapter(adapter);
 
