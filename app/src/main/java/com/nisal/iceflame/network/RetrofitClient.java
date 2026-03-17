@@ -58,4 +58,8 @@ public class RetrofitClient {
     public static OrderApi getOrderApi() {
         return getRetrofitInstance().create(OrderApi.class);
     }
+
+    public static DeviceApi getDeviceApi() {
+        return getRetrofitInstance().create(DeviceApi.class);
+    }
 }

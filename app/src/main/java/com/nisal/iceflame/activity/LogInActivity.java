@@ -7,12 +7,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.nisal.iceflame.databinding.ActivityLogInBinding;
 import com.nisal.iceflame.model.SignInRequest;
 import com.nisal.iceflame.model.User;
 import com.nisal.iceflame.network.AuthApi;
+import com.nisal.iceflame.network.DeviceApi;
 import com.nisal.iceflame.network.RetrofitClient;
 
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +35,12 @@ public class LogInActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            requestPermissions(new String[]{
+                    android.Manifest.permission.POST_NOTIFICATIONS
+            }, 1);
+        }
 
         binding.signInBtnSignIn.setOnClickListener(v->{
 
@@ -66,20 +75,47 @@ public class LogInActivity extends AppCompatActivity {
                         editor.putString("user_name", user.getFullName());
                         editor.apply();
 
-                        Toast.makeText(LogInActivity.this, "Welcome " + user.getFullName(), Toast.LENGTH_SHORT).show();
+                        FirebaseMessaging.getInstance().getToken()
+                                .addOnCompleteListener(task -> {
+
+                                    if (!task.isSuccessful()) return;
+
+                                    String token = task.getResult();
+
+                                    sendTokenToBackend(user.getId(), token);
+                                });
+
+                        Toasty.success(LogInActivity.this, "Welcome " + user.getFullName(), Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LogInActivity.this, MainActivity.class));
                         finish();
                     } else {
-                        Toast.makeText(LogInActivity.this, "Login failed: " + response.code(), Toast.LENGTH_LONG).show();
+                        Toasty.error(LogInActivity.this, "Login failed: " + response.code(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
-                    Toast.makeText(LogInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toasty.error(LogInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         });
 
+    }
+
+    private void sendTokenToBackend(Long userId, String token) {
+
+        DeviceApi api = RetrofitClient.getDeviceApi();
+
+        api.saveToken(userId, token).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                android.util.Log.d("FCM", "Token saved successfully");
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                android.util.Log.e("FCM", "Failed to save token");
+            }
+        });
     }
 }

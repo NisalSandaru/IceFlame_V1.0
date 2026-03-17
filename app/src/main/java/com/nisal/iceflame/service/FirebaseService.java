@@ -25,13 +25,26 @@ public class FirebaseService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage message) {
+
         super.onMessageReceived(message);
 
+        android.util.Log.d("FCM_DEBUG", "Message received!");
+        String title = null;
+        String body = null;
+
+        android.util.Log.d("FCM_DEBUG", "Title: " + title);
+        android.util.Log.d("FCM_DEBUG", "Body: " + body);
+
         if (message.getNotification() != null) {
+            title = message.getNotification().getTitle();
+            body = message.getNotification().getBody();
+        }
 
-            String title = message.getNotification().getTitle();
-            String body = message.getNotification().getBody();
+        // Support data payload (pro way)
+        if (title == null) title = message.getData().get("title");
+        if (body == null) body = message.getData().get("body");
 
+        if (title != null && body != null) {
             showNotification(title, body);
         }
     }
