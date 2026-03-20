@@ -15,4 +15,7 @@ public interface ProductApi {
 
     @GET("api/v1.0/products/{productId}")
     Call<ProductDto> getProductById(@Path("productId") Long productId);
+
+    @GET("api/v1.0/products")
+    Call<List<ProductDto>> getAllProducts();
 }
