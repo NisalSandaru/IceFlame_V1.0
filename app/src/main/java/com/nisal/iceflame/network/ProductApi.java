@@ -7,6 +7,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ProductApi {
 
@@ -18,4 +19,7 @@ public interface ProductApi {
 
     @GET("api/v1.0/products")
     Call<List<ProductDto>> getAllProducts();
+
+    @GET("api/v1.0/products/search")
+    Call<List<ProductDto>> searchProducts(@Query("keyword") String keyword);
 }
