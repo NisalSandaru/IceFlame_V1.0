@@ -56,7 +56,7 @@ public class CheckoutAddressAdapter extends RecyclerView.Adapter<CheckoutAddress
         holder.binding.txtStreet.setText(address.getStreet());
         holder.binding.txtCity.setText(address.getCity());
         holder.binding.txtPostal.setText(address.getPostalCode());
-        holder.binding.txtType.setText(address.getType());
+        holder.binding.txtType.setText(address.getTitle());
 
         boolean selected = address.getId().equals(selectedAddressId);
 

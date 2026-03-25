@@ -62,4 +62,12 @@ public class RetrofitClient {
     public static DeviceApi getDeviceApi() {
         return getRetrofitInstance().create(DeviceApi.class);
     }
+
+    public static CloudinaryApi getCloudinaryApi() {
+        return new Retrofit.Builder()
+                .baseUrl("https://api.cloudinary.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(CloudinaryApi.class);
+    }
 }

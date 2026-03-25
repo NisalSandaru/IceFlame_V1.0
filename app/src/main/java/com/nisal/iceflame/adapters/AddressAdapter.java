@@ -55,7 +55,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
         holder.binding.txtStreet.setText(address.getStreet());
         holder.binding.txtCity.setText(address.getCity());
         holder.binding.txtPostal.setText(address.getPostalCode());
-        holder.binding.txtType.setText(address.getType());
+        holder.binding.txtType.setText(address.getTitle());
 
         holder.binding.btnEdit.setOnClickListener(v ->
                 listener.onEdit(address));

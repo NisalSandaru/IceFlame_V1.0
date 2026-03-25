@@ -1,9 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +27,12 @@
         android:theme="@style/Theme.IceFlame"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- Firebase Notification Service -->
+        <!-- ✅ GOOGLE MAPS API KEY (CORRECT PLACE) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD6AVl1Rs9TyfRtA8zDGO66eFmuw_SLbfw"/>
+
+        <!-- Firebase -->
         <service
             android:name=".service.FirebaseService"
             android:exported="false">
@@ -25,30 +41,22 @@
             </intent-filter>
         </service>
 
-        <activity
-            android:name=".activity.SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.LogInActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.LogOrRegActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.OnboardingActivity"
-            android:exported="false" />
+        <activity android:name=".activity.SignUpActivity" android:exported="false"/>
+        <activity android:name=".activity.LogInActivity" android:exported="false"/>
+        <activity android:name=".activity.LogOrRegActivity" android:exported="false"/>
+        <activity android:name=".activity.OnboardingActivity" android:exported="false"/>
+
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.MainActivity"
-            android:exported="true" />
+
+        <activity android:name=".activity.MainActivity" android:exported="true"/>
+
     </application>
 
 </manifest>

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -69,12 +68,12 @@ public class AddressFragment extends Fragment {
 
                         if (response.isSuccessful() && response.body() != null) {
 
-                            AddressAdapter adapter = new AddressAdapter(response.body(),
+                            AddressAdapter adapter = new AddressAdapter(
+                                    response.body(),
                                     new AddressAdapter.OnAddressActionListener() {
 
                                         @Override
                                         public void onEdit(AddressDto address) {
-
                                             showEditAddressDialog(address);
                                         }
 
@@ -84,7 +83,8 @@ public class AddressFragment extends Fragment {
                                             new AlertDialog.Builder(requireContext())
                                                     .setTitle("Delete Address")
                                                     .setMessage("Are you sure you want to delete this address?")
-                                                    .setPositiveButton("Delete", (d,w)-> deleteAddress(address.getId()))
+                                                    .setPositiveButton("Delete",
+                                                            (d, w) -> deleteAddress(address.getId()))
                                                     .setNegativeButton("Cancel", null)
                                                     .show();
                                         }
@@ -104,7 +104,7 @@ public class AddressFragment extends Fragment {
                 });
     }
 
-    private void deleteAddress(Long id){
+    private void deleteAddress(Long id) {
 
         addressApi.deleteAddress(id)
                 .enqueue(new Callback<ResponseBody>() {
@@ -112,14 +112,14 @@ public class AddressFragment extends Fragment {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                        if(response.isSuccessful()){
+                        if (response.isSuccessful()) {
 
                             Toasty.success(getContext(),
                                     "Address deleted",
                                     Toast.LENGTH_SHORT).show();
 
                             loadAddresses();
-                        }else{
+                        } else {
                             Toasty.error(getContext(),
                                     "Delete failed",
                                     Toast.LENGTH_SHORT).show();
@@ -130,30 +130,23 @@ public class AddressFragment extends Fragment {
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
 
                         Toasty.error(getContext(),
-                                "Delete error: "+t.getMessage(),
+                                "Delete error: " + t.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
-    private void showEditAddressDialog(AddressDto address){
+    private void showEditAddressDialog(AddressDto address) {
 
         DialogAddAddressBinding dialogBinding =
                 DialogAddAddressBinding.inflate(getLayoutInflater());
 
+        // Set existing values
+        dialogBinding.etTitle.setText(address.getTitle());
         dialogBinding.etStreet.setText(address.getStreet());
         dialogBinding.etCity.setText(address.getCity());
         dialogBinding.etPostal.setText(address.getPostalCode());
-
-        String[] types = {"BILLING", "SHIPPING"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                types
-        );
-
-        dialogBinding.spAddressType.setAdapter(adapter);
+        dialogBinding.chkDefault.setChecked(address.getIsDefault() != null && address.getIsDefault());
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogBinding.getRoot())
@@ -161,32 +154,41 @@ public class AddressFragment extends Fragment {
 
         dialogBinding.btnSaveAddress.setOnClickListener(v -> {
 
+            String title = dialogBinding.etTitle.getText().toString().trim();
             String street = dialogBinding.etStreet.getText().toString().trim();
             String city = dialogBinding.etCity.getText().toString().trim();
             String postal = dialogBinding.etPostal.getText().toString().trim();
 
-            if(street.isEmpty()){
+            // Validation
+            if (title.isEmpty()) {
+                dialogBinding.etTitle.setError("Title is required");
+                dialogBinding.etTitle.requestFocus();
+                return;
+            }
+
+            if (street.isEmpty()) {
                 dialogBinding.etStreet.setError("Street is required");
                 dialogBinding.etStreet.requestFocus();
                 return;
             }
 
-            if(city.isEmpty()){
+            if (city.isEmpty()) {
                 dialogBinding.etCity.setError("City is required");
                 dialogBinding.etCity.requestFocus();
                 return;
             }
 
-            if(postal.isEmpty()){
+            if (postal.isEmpty()) {
                 dialogBinding.etPostal.setError("Postal code is required");
                 dialogBinding.etPostal.requestFocus();
                 return;
             }
 
+            // Update values
+            address.setTitle(title);
             address.setStreet(street);
             address.setCity(city);
             address.setPostalCode(postal);
-            address.setType(dialogBinding.spAddressType.getSelectedItem().toString());
             address.setIsDefault(dialogBinding.chkDefault.isChecked());
 
             addressApi.updateAddress(address.getId(), address)
@@ -196,14 +198,13 @@ public class AddressFragment extends Fragment {
                         public void onResponse(Call<AddressDto> call,
                                                Response<AddressDto> response) {
 
-                            if(response.isSuccessful()){
+                            if (response.isSuccessful()) {
 
                                 Toasty.success(getContext(),
                                         "Address updated",
                                         Toast.LENGTH_SHORT).show();
 
                                 dialog.dismiss();
-
                                 loadAddresses();
                             }
                         }
@@ -226,56 +227,53 @@ public class AddressFragment extends Fragment {
         DialogAddAddressBinding dialogBinding =
                 DialogAddAddressBinding.inflate(getLayoutInflater());
 
-        String[] types = {"BILLING", "SHIPPING"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                types
-        );
-
-        dialogBinding.spAddressType.setAdapter(adapter);
-
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogBinding.getRoot())
                 .create();
 
         dialogBinding.btnSaveAddress.setOnClickListener(v -> {
 
+            String title = dialogBinding.etTitle.getText().toString().trim();
             String street = dialogBinding.etStreet.getText().toString().trim();
             String city = dialogBinding.etCity.getText().toString().trim();
             String postal = dialogBinding.etPostal.getText().toString().trim();
 
             // Validation
-            if(street.isEmpty()){
+            if (title.isEmpty()) {
+                dialogBinding.etTitle.setError("Title is required");
+                dialogBinding.etTitle.requestFocus();
+                return;
+            }
+
+            if (street.isEmpty()) {
                 dialogBinding.etStreet.setError("Street is required");
                 dialogBinding.etStreet.requestFocus();
                 return;
             }
 
-            if(city.isEmpty()){
+            if (city.isEmpty()) {
                 dialogBinding.etCity.setError("City is required");
                 dialogBinding.etCity.requestFocus();
                 return;
             }
 
-            if(postal.isEmpty()){
+            if (postal.isEmpty()) {
                 dialogBinding.etPostal.setError("Postal code is required");
                 dialogBinding.etPostal.requestFocus();
                 return;
             }
 
-            if(postal.length() < 4){
+            if (postal.length() < 4) {
                 dialogBinding.etPostal.setError("Invalid postal code");
                 dialogBinding.etPostal.requestFocus();
                 return;
             }
 
             AddressDto address = AddressDto.builder()
+                    .title(title)
                     .street(street)
                     .city(city)
                     .postalCode(postal)
-                    .type(dialogBinding.spAddressType.getSelectedItem().toString())
                     .isDefault(dialogBinding.chkDefault.isChecked())
                     .userId(userId)
                     .build();
@@ -294,7 +292,6 @@ public class AddressFragment extends Fragment {
                                         Toast.LENGTH_SHORT).show();
 
                                 dialog.dismiss();
-
                                 loadAddresses();
                             }
                         }

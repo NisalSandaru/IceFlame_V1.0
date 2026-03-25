@@ -9,10 +9,17 @@
         android:padding="20dp">
 
         <EditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Address Title (e.g. Home, Work)"/>
+
+        <EditText
             android:id="@+id/etStreet"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Street Address"/>
+            android:hint="Street Address"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:id="@+id/etCity"
@@ -26,12 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:hint="Postal Code"
-            android:layout_marginTop="10dp"/>
-
-        <Spinner
-            android:id="@+id/spAddressType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"/>
 
         <CheckBox

@@ -67,6 +67,7 @@ public class SettingFragment extends Fragment {
         goMyProfile();
         goAddress();
         goMyOrders();
+        goLocation();
     }
 
     private void goAddress(){
@@ -94,6 +95,21 @@ public class SettingFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.fragment_container, new ProfileFragment())
                     .addToBackStack("profile")
+                    .commit();
+        });
+
+    }
+
+    private void goLocation(){
+
+        binding.btnLocation.setOnClickListener(v->{
+            Fragment fragment = new MapFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new MapFragment())
+                    .addToBackStack("location")
                     .commit();
         });
 

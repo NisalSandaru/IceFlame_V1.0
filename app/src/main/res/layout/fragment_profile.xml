@@ -10,6 +10,8 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+
+
         <!-- Profile Image -->
         <FrameLayout
             android:layout_width="130dp"
@@ -95,6 +97,18 @@
             android:background="@drawable/custom_input_search"
             android:padding="12dp"/>
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <!-- Save Button -->
         <Button
