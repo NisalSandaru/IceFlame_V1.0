@@ -33,13 +33,11 @@ public class MyOrdersFragment extends Fragment {
 
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
-
                     if(position == 0){
                         tab.setText("Current");
-                    }else{
+                    } else{
                         tab.setText("Previous");
                     }
-
                 }).attach();
 
         return view;

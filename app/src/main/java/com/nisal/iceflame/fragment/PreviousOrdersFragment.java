@@ -76,6 +76,8 @@ public class PreviousOrdersFragment extends Fragment {
                 .enqueue(new Callback<List<OrderDto>>() {
                     @Override
                     public void onResponse(Call<List<OrderDto>> call, Response<List<OrderDto>> response) {
+                        if (!isAdded() || binding == null) return;
+
                         if (response.isSuccessful() && response.body() != null) {
                             previousOrders.clear();
                             previousOrders.addAll(response.body());
@@ -87,6 +89,11 @@ public class PreviousOrdersFragment extends Fragment {
                             } else {
                                 binding.recyclerOrders.setVisibility(View.VISIBLE);
                                 binding.emptyOrdersView.getRoot().setVisibility(View.GONE);
+
+                                // 🔥 Scroll to bottom
+                                binding.recyclerOrders.post(() ->
+                                        binding.recyclerOrders.scrollToPosition(adapter.getItemCount() - 1)
+                                );
                             }
                         }
                     }

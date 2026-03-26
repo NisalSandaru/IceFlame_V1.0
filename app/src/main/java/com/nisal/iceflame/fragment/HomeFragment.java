@@ -1,11 +1,17 @@
 package com.nisal.iceflame.fragment;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,6 +54,13 @@ public class HomeFragment extends Fragment {
 
     private final List<ProductDto> fullList = new ArrayList<>();
 
+    // 🔥 Shake Detection
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private SensorEventListener shakeListener;
+    private static final float SHAKE_THRESHOLD = 12f;
+    private long lastShakeTime = 0;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
@@ -64,8 +77,8 @@ public class HomeFragment extends Fragment {
 
         setupRecycler();
         setupBanner();
+        setupShakeDetector();
 
-        // 🔥 ALWAYS reload categories (fix tab disappearing issue)
         loadCategories();
     }
 
@@ -111,7 +124,7 @@ public class HomeFragment extends Fragment {
     }
 
     // =========================
-    // Load Categories
+    // Categories
     // =========================
     private void loadCategories() {
 
@@ -133,8 +146,7 @@ public class HomeFragment extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(Call<List<CategoryDto>> call, Throwable t) {
-                    }
+                    public void onFailure(Call<List<CategoryDto>> call, Throwable t) {}
                 });
     }
 
@@ -145,9 +157,7 @@ public class HomeFragment extends Fragment {
 
         binding.tabLayout.removeAllTabs();
 
-        binding.tabLayout.addTab(
-                binding.tabLayout.newTab().setText("All")
-        );
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("All"));
 
         for (CategoryDto category : categoryList) {
             binding.tabLayout.addTab(
@@ -184,23 +194,16 @@ public class HomeFragment extends Fragment {
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        // 🔥 ALWAYS LOAD FIRST TIME
         loadAllProducts();
 
-        // 🔥 Select "All" tab
         TabLayout.Tab allTab = binding.tabLayout.getTabAt(0);
-        if (allTab != null) {
-            allTab.select();
-        }
+        if (allTab != null) allTab.select();
     }
 
     // =========================
-    // Load ALL Products
+    // Load Products
     // =========================
     private void loadAllProducts() {
-
-        homeProducts.clear();
-        adapter.notifyDataSetChanged();
 
         RetrofitClient.getProductApi()
                 .getAllProducts()
@@ -218,23 +221,17 @@ public class HomeFragment extends Fragment {
                             currentPage = 0;
                             isLastPage = false;
 
+                            homeProducts.clear();
                             loadNextPage();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<List<ProductDto>> call, Throwable t) {
-                    }
+                    public void onFailure(Call<List<ProductDto>> call, Throwable t) {}
                 });
     }
 
-    // =========================
-    // Load by Category
-    // =========================
     private void loadProductsByCategory(Long categoryId) {
-
-        homeProducts.clear();
-        adapter.notifyDataSetChanged();
 
         RetrofitClient.getProductApi()
                 .getProductsByCategory(categoryId)
@@ -252,13 +249,13 @@ public class HomeFragment extends Fragment {
                             currentPage = 0;
                             isLastPage = false;
 
+                            homeProducts.clear();
                             loadNextPage();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<List<ProductDto>> call, Throwable t) {
-                    }
+                    public void onFailure(Call<List<ProductDto>> call, Throwable t) {}
                 });
     }
 
@@ -295,6 +292,81 @@ public class HomeFragment extends Fragment {
     }
 
     // =========================
+    // Shake Detector
+    // =========================
+    private void setupShakeDetector() {
+
+        sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
+
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+
+        shakeListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
+
+                if (acceleration > SHAKE_THRESHOLD) {
+
+                    long currentTime = System.currentTimeMillis();
+
+                    if (currentTime - lastShakeTime > 1500) {
+                        lastShakeTime = currentTime;
+
+                        Toast.makeText(getContext(), "Reloading...", Toast.LENGTH_SHORT).show();
+                        reloadData();
+                    }
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
+    }
+
+    private void reloadData() {
+
+        currentPage = 0;
+        isLastPage = false;
+
+        homeProducts.clear();
+        adapter.notifyDataSetChanged();
+
+        int selectedTab = binding.tabLayout.getSelectedTabPosition();
+
+        if (selectedTab == 0) {
+            loadAllProducts();
+        } else {
+            CategoryDto selected = categoryList.get(selectedTab - 1);
+            loadProductsByCategory(selected.getId());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (sensorManager != null && accelerometer != null) {
+            sensorManager.registerListener(shakeListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(shakeListener);
+        }
+    }
+
+    // =========================
     // Banner
     // =========================
     private void setupBanner() {
@@ -318,9 +390,6 @@ public class HomeFragment extends Fragment {
         bannerHandler.postDelayed(bannerRunnable, 3000);
     }
 
-    // =========================
-    // Cleanup
-    // =========================
     @Override
     public void onDestroyView() {
         super.onDestroyView();

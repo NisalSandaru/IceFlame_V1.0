@@ -43,13 +43,16 @@
         app:cardElevation="4dp"
         app:layout_constraintBottom_toTopOf="@id/paymentLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardBackgroundColor="@color/md_theme_inverseOnSurface_highContrast">
 
         <LinearLayout
             android:orientation="vertical"
             android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+
 
             <TextView
                 android:text="Order Summary"
@@ -152,7 +155,8 @@
             app:cardElevation="2dp"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="@color/status_delivered_bg">
 
             <TextView
                 android:text="Cash On Delivery"
@@ -173,7 +177,8 @@
             app:cardElevation="2dp"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginStart="8dp">
+            android:layout_marginStart="8dp"
+            app:cardBackgroundColor="@color/status_delivered_bg">
 
             <TextView
                 android:text="PayHere Card"

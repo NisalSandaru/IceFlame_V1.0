@@ -1,96 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".fragment.OrderDetailsFragment">
+    android:background="#F8F8F8">
 
-    <!-- Header -->
-    <TextView
-        android:id="@+id/txtTitle"
+    <!-- Scrollable content -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Order Details"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:padding="16dp"
-        android:textColor="#000"/>
-
-    <!-- Order Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/orderInfoCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="10dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="3dp">
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp"> <!-- space for sticky total -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
+            <!-- Header -->
             <TextView
-                android:id="@+id/txtOrderId"
-                android:layout_width="wrap_content"
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Order #1001"
+                android:text="Order Details"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textColor="#111"
+                android:padding="16dp"/>
 
-            <TextView
-                android:id="@+id/txtStatus"
-                android:layout_width="wrap_content"
+            <!-- Order Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/orderInfoCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="PROCESSING"
-                android:textSize="13sp"
-                android:layout_marginTop="4dp"/>
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#FFFFFF">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/txtOrderId"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Order #1001"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="#111"/>
+
+                        <TextView
+                            android:id="@+id/txtStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PROCESSING"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:background="@drawable/status_bg"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 Mar 2026 • 10:30 AM"
+                        android:textSize="13sp"
+                        android:textColor="#777"
+                        android:layout_marginTop="6dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/orderProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="12dp"
+                        android:progress="50"
+                        android:progressTint="#FF5722"
+                        android:backgroundTint="#EEEEEE"/>
+
+                    <TextView
+                        android:id="@+id/txtProgressLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Preparing your food 🍳"
+                        android:textSize="13sp"
+                        android:textColor="#555"
+                        android:layout_marginTop="6dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Items Title -->
             <TextView
-                android:id="@+id/txtDate"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="15 Mar 2026 • 10:30 AM"
-                android:textSize="12sp"
-                android:textColor="#777"
-                android:layout_marginTop="4dp"/>
+                android:text="Items"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="6dp"/>
 
+            <!-- Items RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="16dp" />
         </LinearLayout>
+    </ScrollView>
 
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Items Title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Items"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="6dp"/>
-
-    <!-- Items List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerItems"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingHorizontal="10dp"/>
-
-    <!-- Total Price -->
+    <!-- Sticky Total at Bottom -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="3dp">
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -103,7 +146,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Total"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="#777"/>
 
             <TextView
                 android:id="@+id/txtTotal"
@@ -111,10 +155,9 @@
                 android:layout_height="wrap_content"
                 android:text="Rs.1500"
                 android:textStyle="bold"
-                android:textSize="18sp"/>
-
+                android:textSize="18sp"
+                android:textColor="#111"/>
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+</FrameLayout>

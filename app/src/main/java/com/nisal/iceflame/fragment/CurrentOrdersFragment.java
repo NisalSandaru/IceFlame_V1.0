@@ -104,6 +104,11 @@ public class CurrentOrdersFragment extends Fragment {
                                 binding.recyclerOrders.setVisibility(View.VISIBLE);
                                 binding.emptyOrdersView.getRoot().setVisibility(View.GONE);
 
+                                // 🔥 Scroll to bottom
+                                binding.recyclerOrders.post(() ->
+                                        binding.recyclerOrders.scrollToPosition(adapter.getItemCount() - 1)
+                                );
+
                             }
 
                         } else {

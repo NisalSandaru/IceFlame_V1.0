@@ -3,6 +3,7 @@ package com.nisal.iceflame.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -68,6 +69,20 @@ public class SettingFragment extends Fragment {
         goAddress();
         goMyOrders();
         goLocation();
+        setupContact();
+    }
+
+    private void setupContact() {
+
+        binding.btnContact.setOnClickListener(v -> {
+
+            String phoneNumber = "0771234567"; // change to your restaurant number
+
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+
+            startActivity(intent);
+        });
     }
 
     private void goAddress(){

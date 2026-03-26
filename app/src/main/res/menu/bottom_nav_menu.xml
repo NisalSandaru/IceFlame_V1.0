@@ -21,10 +21,10 @@
         android:icon="@drawable/favorite_24px"
         android:title="@string/watchlist" />
 
-    <item
-        android:id="@+id/bottom_nav_notification"
-        android:icon="@drawable/notifications_24px"
-        android:title="@string/notification" />
+<!--    <item-->
+<!--        android:id="@+id/bottom_nav_notification"-->
+<!--        android:icon="@drawable/notifications_24px"-->
+<!--        android:title="@string/notification" />-->
 
     <item
         android:id="@+id/bottom_nav_setting"

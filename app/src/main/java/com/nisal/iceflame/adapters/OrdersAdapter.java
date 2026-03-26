@@ -1,9 +1,10 @@
 package com.nisal.iceflame.adapters;
 
+import android.animation.ObjectAnimator;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -16,8 +17,6 @@ import com.nisal.iceflame.model.OrderDto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import es.dmoral.toasty.Toasty;
 
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder> {
 
@@ -48,33 +47,30 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         OrderDto order = orders.get(position);
-        View itemView = holder.itemView;
-        android.content.Context context = itemView.getContext();
 
-        holder.binding.txtOrderId.setText("Order #"+order.getId());
+        // Order ID
+        holder.binding.txtOrderId.setText("Order #" + order.getId());
 
-        // --- Status Text & Color ---
+        // Status
         String status = order.getStatus().toUpperCase();
-        holder.binding.txtStatus.setText(getStatusIcon(status) + " " + status);
-        setStatusColor(holder, status, context);
+        holder.binding.txtStatus.setText(status);
 
-        // --- Date Formatting ---
+        // Date
         try {
-            String dateTime = order.getCreatedAt();
-            LocalDateTime ldt = LocalDateTime.parse(dateTime);
+            LocalDateTime ldt = LocalDateTime.parse(order.getCreatedAt());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy • h:mm a");
             holder.binding.txtDate.setText(ldt.format(formatter));
         } catch (Exception e) {
             holder.binding.txtDate.setText(order.getCreatedAt());
         }
 
-        // --- Total Price ---
-        holder.binding.txtTotal.setText("Total: Rs. " + order.getTotalAmount());
+        // Total
+        holder.binding.txtTotal.setText("Rs. " + order.getTotalAmount());
 
-        // --- Progress Stepper UI ---
-        setupProgressStepper(holder, status, context);
+        // 🔥 Progress + Color
+        setupProgressBar(holder, status);
 
-        holder.binding.orderCard.setOnClickListener(v -> {
+        holder.binding.getRoot().setOnClickListener(v -> {
             if(listener != null){
                 listener.onOrderClick(order);
             }
@@ -86,7 +82,6 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
         return orders.size();
     }
 
-    // --- ViewHolder ---
     static class ViewHolder extends RecyclerView.ViewHolder {
         ItemOrderBinding binding;
         public ViewHolder(ItemOrderBinding binding) {
@@ -95,99 +90,75 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
         }
     }
 
-    // --- Helper: Status Icon ---
-    private String getStatusIcon(String status) {
-        switch (status) {
-            case "PENDING": return "\u23F3";   // ⏳
-            case "CONFIRMED": return "\u2705"; // ✅
-            case "PROCESSING": return "\u2699"; // ⚙
-            case "SHIPPED": return "\uD83D\uDE9A"; // 🚚
-            case "DELIVERED": return "\uD83D\uDCE6"; // 📦
-            case "CANCELLED": return "\u274C"; // ❌
-            default: return "";
-        }
-    }
+    // =========================
+    // 🔥 PROGRESS + ANIMATION
+    // =========================
+    private void setupProgressBar(ViewHolder holder, String status) {
 
-    // --- Helper: Status Color ---
-    private void setStatusColor(ViewHolder holder, String status, android.content.Context context) {
+        int progress = 0;
+        String label = "";
+        String colorHex = "#FF5722"; // default orange
+
         switch (status) {
+
             case "PENDING":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_pending_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_pending_text));
+                progress = 10;
+                label = "Waiting for confirmation ⏳";
+                colorHex = "#FFC107"; // yellow
                 break;
+
             case "CONFIRMED":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_confirmed_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_confirmed_text));
+                progress = 30;
+                label = "Order confirmed ✅";
+                colorHex = "#03A9F4"; // blue
                 break;
+
             case "PROCESSING":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_processing_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_processing_text));
+                progress = 60;
+                label = "Preparing your food 🍳";
+                colorHex = "#FF5722"; // orange
                 break;
+
             case "SHIPPED":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_shipped_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_shipped_text));
+                progress = 85;
+                label = "On the way 🚚";
+                colorHex = "#9C27B0"; // purple
                 break;
+
             case "DELIVERED":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_delivered_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_delivered_text));
+                progress = 100;
+                label = "Delivered 📦";
+                colorHex = "#4CAF50"; // green
                 break;
+
             case "CANCELLED":
-                holder.binding.txtStatus.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.status_cancelled_bg));
-                holder.binding.txtStatus.setTextColor(
-                        ContextCompat.getColor(context, R.color.status_cancelled_text));
+                progress = 0;
+                label = "Order cancelled ❌";
+                colorHex = "#F44336"; // red
                 break;
         }
-    }
 
-    // --- Helper: Progress Stepper ---
-    private void setupProgressStepper(ViewHolder holder, String status, android.content.Context context) {
+        // Set label
+        holder.binding.txtProgressLabel.setText(label);
 
-        holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.gray));
-        holder.binding.stepConfirmed.setTextColor(ContextCompat.getColor(context, R.color.gray));
-        holder.binding.stepProcessing.setTextColor(ContextCompat.getColor(context, R.color.gray));
-        holder.binding.stepShipped.setTextColor(ContextCompat.getColor(context, R.color.gray));
-        holder.binding.stepDelivered.setTextColor(ContextCompat.getColor(context, R.color.gray));
+        // 🔥 Animate Progress
+        ObjectAnimator animation = ObjectAnimator.ofInt(
+                holder.binding.orderProgress,
+                "progress",
+                0,
+                progress
+        );
+        animation.setDuration(800);
+        animation.start();
 
-        switch (status) {
-            case "PENDING":
-                holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.status_pending_text));
-                break;
-            case "CONFIRMED":
-                holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.status_confirmed_text));
-                holder.binding.stepConfirmed.setTextColor(ContextCompat.getColor(context, R.color.status_confirmed_text));
-                break;
-            case "PROCESSING":
-                holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.status_processing_text));
-                holder.binding.stepConfirmed.setTextColor(ContextCompat.getColor(context, R.color.status_processing_text));
-                holder.binding.stepProcessing.setTextColor(ContextCompat.getColor(context, R.color.status_processing_text));
-                break;
-            case "SHIPPED":
-                holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.status_shipped_text));
-                holder.binding.stepConfirmed.setTextColor(ContextCompat.getColor(context, R.color.status_shipped_text));
-                holder.binding.stepProcessing.setTextColor(ContextCompat.getColor(context, R.color.status_shipped_text));
-                holder.binding.stepShipped.setTextColor(ContextCompat.getColor(context, R.color.status_shipped_text));
-                break;
-            case "DELIVERED":
-                holder.binding.stepPending.setTextColor(ContextCompat.getColor(context, R.color.status_delivered_text));
-                holder.binding.stepConfirmed.setTextColor(ContextCompat.getColor(context, R.color.status_delivered_text));
-                holder.binding.stepProcessing.setTextColor(ContextCompat.getColor(context, R.color.status_delivered_text));
-                holder.binding.stepShipped.setTextColor(ContextCompat.getColor(context, R.color.status_delivered_text));
-                holder.binding.stepDelivered.setTextColor(ContextCompat.getColor(context, R.color.status_delivered_text));
-                break;
-            case "CANCELLED":
-                // Optional: make all steps gray
-                break;
-        }
+        // 🔥 Change Progress Color
+        holder.binding.orderProgress.setProgressTintList(
+                ColorStateList.valueOf(Color.parseColor(colorHex))
+        );
+
+        // 🔥 Change Status Badge Color
+        holder.binding.txtStatus.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(colorHex))
+        );
     }
 }
