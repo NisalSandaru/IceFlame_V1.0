@@ -30,7 +30,7 @@
         <!-- ✅ GOOGLE MAPS API KEY (CORRECT PLACE) -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=""/>
+            android:value="AIzaSyD6AVl1Rs9TyfRtA8zDGO66eFmuw_SLbfw"/>
 
         <!-- Firebase -->
         <service
