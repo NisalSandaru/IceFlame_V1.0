@@ -70,6 +70,32 @@ public class SettingFragment extends Fragment {
         goMyOrders();
         goLocation();
         setupContact();
+        logOut();
+    }
+
+    private void logOut(){
+
+        binding.btnLogout.setOnClickListener(v -> {
+
+            // Clear SharedPreferences
+            SharedPreferences prefs = requireActivity()
+                    .getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear(); // remove all saved data (user_id etc.)
+            editor.apply();
+
+            // Show message
+            Toasty.success(requireContext(), "Logged out successfully", Toasty.LENGTH_SHORT).show();
+
+            // Go to Login screen
+            Intent intent = new Intent(getContext(), LogInActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+
+            // Optional: close current activity
+            requireActivity().finish();
+        });
     }
 
     private void setupContact() {
